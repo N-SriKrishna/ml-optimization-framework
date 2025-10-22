@@ -40,7 +40,7 @@ strategy = solver.solve(analysis)
 ## 🚀 Installation
 
 Clone repository
-git clone https://github.com/YOUR_USERNAME/ml-optimization-framework.git
+git clone https://github.com/N-SriKrishna/ml-optimization-framework.git
 cd ml-optimization-framework
 
 Create virtual environment
@@ -247,7 +247,7 @@ If you use this framework in your research, please cite:
 
 @software{ml_optimization_framework,
 title={ML Model Optimization Framework: ONNX-Centric Universal Pipeline},
-author={Your Name},
+author={N-SriKrishna},
 year={2025},
 url={https://github.com/N-SriKrishna/ml-optimization-framework}
 }
