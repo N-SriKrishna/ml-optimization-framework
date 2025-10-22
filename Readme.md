@@ -19,7 +19,7 @@
 
 | Feature | Standard Tools | This Framework |
 |---------|----------------|----------------|
-| Optimization | Single technique | **36+ combinations tested** |
+| Optimization | Single technique | **100+ combinations tested** |
 | Decision Making | Manual trial-error | **Automated constraint solving** |
 | Deployment | Generic export | **Hardware-specific (7 platforms)** |
 | Analysis | Model file only | **Reports + visualizations** |
@@ -188,7 +188,7 @@ strategy = solver.solve(analysis)  # Auto-generates optimal strategy
 ```
 
 ### 🔬 Combination Explorer
-Tests 36+ combinations (quantization × pruning × order) automatically
+Tests **102 combinations** (3 quantization × 17 pruning × 2 orderings) automatically with intelligent exploration
 
 ### 📊 Pareto Analysis
 Multi-objective optimization with 7 visualization types (3D plots, radar charts, heatmaps)
