@@ -25,6 +25,81 @@
 | Analysis | Model file only | **Reports + visualizations** |
 
 **Real Results:** 3.67× smaller models, 2.48× faster inference, 96.6% accuracy retained
+## 📊 Benchmarks
+
+### Real-World Results: YOLOv8n
+
+Optimized for **Snapdragon 8 Gen 2** (mobile deployment):
+
+| Metric | Original | Optimized | Improvement |
+|--------|----------|-----------|-------------|
+| **Model Size** | 12.26 MB | 3.34 MB | **3.67× smaller** ⬇️ |
+| **Inference Latency** | 147 ms | 59 ms | **2.48× faster** ⚡ |
+| **Accuracy (mAP)** | 37.3% | 36.0% | **96.6% retained** ✅ |
+
+**Optimization Applied:** Dynamic INT8 + Structured Pruning (35%)
+
+---
+
+## 🎨 Visualizations
+
+### Pareto Front Analysis
+
+Our framework automatically identifies **Pareto-optimal solutions** - configurations that offer the best trade-offs between conflicting objectives.
+
+<div align="center">
+
+![Pareto Front: Accuracy vs Latency](docs/images/pareto_accuracy_vs_latency.png)
+
+*Figure 1: Pareto front showing optimal trade-offs between accuracy and latency. Star markers indicate Pareto-optimal solutions.*
+
+</div>
+
+<div align="center">
+
+![Pareto Front: Accuracy vs Size](docs/images/pareto_accuracy_vs_size.png)
+
+*Figure 2: Model size vs accuracy trade-off analysis. Multiple optimal solutions identified.*
+
+</div>
+
+### Combination Exploration Results
+
+<div align="center">
+
+![All Combinations](docs/images/combo_compression_speedup.png)
+
+*Figure 3: All 36 tested combinations. Green stars = Pareto optimal, Red circles = Dominated solutions.*
+
+</div>
+
+<div align="center">
+
+![Performance Heatmap](docs/images/combo_heatmap.png)
+
+*Figure 4: Heatmap showing compression, speedup, and accuracy impact across all configurations.*
+
+</div>
+
+### 3D Pareto Visualization
+
+<div align="center">
+
+![3D Pareto Surface](docs/images/pareto_3d.png)
+
+*Figure 5: Interactive 3D visualization of the Pareto front (Accuracy × Latency × Size).*
+
+</div>
+
+### Radar Chart Comparison
+
+<div align="center">
+
+![Radar Comparison](docs/images/pareto_radar.png)
+
+*Figure 6: Multi-dimensional comparison of top 5 Pareto-optimal solutions.*
+
+</div>
 
 ---
 

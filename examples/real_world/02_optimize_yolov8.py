@@ -50,7 +50,7 @@ def main():
     logger.info("STEP 1: CONVERTING YOLOV8 TO ONNX")
     logger.info("=" * 80)
     
-    onnx_path = output_base / 'yolov8n.onnx'
+    onnx_path = Path('models/yolov8n.onnx')
     
     try:
         convert_to_onnx(
