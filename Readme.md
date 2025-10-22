@@ -101,16 +101,14 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 30-Second Example
+### In-Built Example
 
 ```python
-from src.converters.onnx_converter import convert_to_onnx
-from src.optimizers.quantizer import quantize_dynamic_int8
-
-# Convert and optimize
-convert_to_onnx('model.pt', 'model.onnx', input_shape=(1, 3, 224, 224))
-quantize_dynamic_int8('model.onnx', 'model_optimized.onnx')
-# Result: 3-4× smaller, 2× faster
+git clone https://github.com/N-SriKrishna/ml-optimization-framework.git
+cd ml-optimization-framework
+pip install -q colorama onnx onnxruntime torch numpy pandas matplotlib pyyaml tqdm ultralytics
+python examples/real_world/01_download_yolov8.py
+python examples/real_world/02_optimize_yolov8.py
 ```
 
 ### Full Pipeline
