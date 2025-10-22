@@ -45,61 +45,47 @@ Optimized for **Snapdragon 8 Gen 2** (mobile deployment):
 
 ### Pareto Front Analysis
 
-Our framework automatically identifies **Pareto-optimal solutions** - configurations that offer the best trade-offs between conflicting objectives.
+Our framework automatically identifies **Pareto-optimal solutions** - configurations that offer the best trade-offs.
 
-<div align="center">
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/images/pareto_accuracy_vs_latency.png" alt="Pareto Front: Accuracy vs Latency">
+      <p align="center"><em>Accuracy vs Latency trade-offs</em></p>
+    </td>
+    <td width="50%">
+      <img src="docs/images/pareto_accuracy_vs_size.png" alt="Pareto Front: Accuracy vs Size">
+      <p align="center"><em>Accuracy vs Model Size</em></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/images/combo_compression_speedup.png" alt="All Combinations">
+      <p align="center"><em>36 combinations tested (⭐ = Pareto optimal)</em></p>
+    </td>
+    <td width="50%">
+      <img src="docs/images/pareto_3d.png" alt="3D Pareto Surface">
+      <p align="center"><em>3D Pareto visualization</em></p>
+    </td>
+  </tr>
+</table>
 
-![Pareto Front: Accuracy vs Latency](docs/images/pareto_accuracy_vs_latency.png)
+### Detailed Analysis
 
-*Figure 1: Pareto front showing optimal trade-offs between accuracy and latency. Star markers indicate Pareto-optimal solutions.*
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/images/combo_heatmap.png" alt="Performance Heatmap">
+      <p align="center"><em>Performance heatmap across configurations</em></p>
+    </td>
+    <td width="50%">
+      <img src="docs/images/pareto_radar.png" alt="Radar Comparison">
+      <p align="center"><em>Multi-dimensional comparison</em></p>
+    </td>
+  </tr>
+</table>
 
-</div>
-
-<div align="center">
-
-![Pareto Front: Accuracy vs Size](docs/images/pareto_accuracy_vs_size.png)
-
-*Figure 2: Model size vs accuracy trade-off analysis. Multiple optimal solutions identified.*
-
-</div>
-
-### Combination Exploration Results
-
-<div align="center">
-
-![All Combinations](docs/images/combo_compression_speedup.png)
-
-*Figure 3: All 36 tested combinations. Green stars = Pareto optimal, Red circles = Dominated solutions.*
-
-</div>
-
-<div align="center">
-
-![Performance Heatmap](docs/images/combo_heatmap.png)
-
-*Figure 4: Heatmap showing compression, speedup, and accuracy impact across all configurations.*
-
-</div>
-
-### 3D Pareto Visualization
-
-<div align="center">
-
-![3D Pareto Surface](docs/images/pareto_3d.png)
-
-*Figure 5: Interactive 3D visualization of the Pareto front (Accuracy × Latency × Size).*
-
-</div>
-
-### Radar Chart Comparison
-
-<div align="center">
-
-![Radar Comparison](docs/images/pareto_radar.png)
-
-*Figure 6: Multi-dimensional comparison of top 5 Pareto-optimal solutions.*
-
-</div>
+> 💡 **All visualizations are auto-generated** by running `python examples/real_world/02_optimize_yolov8.py`
 
 ---
 
@@ -115,16 +101,14 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 30-Second Example
+### In-Built Example
 
 ```python
-from src.converters.onnx_converter import convert_to_onnx
-from src.optimizers.quantizer import quantize_dynamic_int8
-
-# Convert and optimize
-convert_to_onnx('model.pt', 'model.onnx', input_shape=(1, 3, 224, 224))
-quantize_dynamic_int8('model.onnx', 'model_optimized.onnx')
-# Result: 3-4× smaller, 2× faster
+git clone https://github.com/N-SriKrishna/ml-optimization-framework.git
+cd ml-optimization-framework
+pip install -q colorama onnx onnxruntime torch numpy pandas matplotlib pyyaml tqdm ultralytics
+python examples/real_world/01_download_yolov8.py
+python examples/real_world/02_optimize_yolov8.py
 ```
 
 ### Full Pipeline
