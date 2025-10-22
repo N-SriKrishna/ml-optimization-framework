@@ -43,9 +43,9 @@ Optimized for **Snapdragon 8 Gen 2** (mobile deployment):
 
 ## 🎨 Visualizations
 
-### Pareto Front Analysis
+### Pareto Front Analysis (102 Combinations Tested)
 
-Our framework automatically identifies **Pareto-optimal solutions** - configurations that offer the best trade-offs.
+Our framework automatically identifies **Pareto-optimal solutions** from **102 tested combinations** - configurations that offer the best trade-offs.
 
 <table>
   <tr>
@@ -61,7 +61,7 @@ Our framework automatically identifies **Pareto-optimal solutions** - configurat
   <tr>
     <td width="50%">
       <img src="docs/images/combo_compression_speedup.png" alt="All Combinations">
-      <p align="center"><em>36 combinations tested (⭐ = Pareto optimal)</em></p>
+      <p align="center"><em><strong>102 combinations tested</strong> (⭐ = Pareto optimal)</em></p>
     </td>
     <td width="50%">
       <img src="docs/images/pareto_3d.png" alt="3D Pareto Surface">
@@ -75,17 +75,31 @@ Our framework automatically identifies **Pareto-optimal solutions** - configurat
 <table>
   <tr>
     <td width="50%">
-      <img src="docs/images/combo_heatmap.png" alt="Performance Heatmap">
-      <p align="center"><em>Performance heatmap across configurations</em></p>
+      <img src="docs/images/trade_off_heatmap.png" alt="Trade-off Heatmap">
+      <p align="center"><em>Performance heatmap across 102 configurations</em></p>
     </td>
     <td width="50%">
       <img src="docs/images/pareto_radar.png" alt="Radar Comparison">
-      <p align="center"><em>Multi-dimensional comparison</em></p>
+      <p align="center"><em>Multi-dimensional comparison (Top 20 variants)</em></p>
     </td>
   </tr>
 </table>
 
-> 💡 **All visualizations are auto-generated** by running `python examples/real_world/02_optimize_yolov8.py`
+### Key Results from 102 Combinations
+
+| Metric | Value | Technique |
+|--------|-------|-----------|
+| **Best Compression** | 3.67× | Dynamic INT8 + Magnitude 10% |
+| **Best Speedup** | 3.04× | Dynamic INT8 + Structured 65% |
+| **Best Balanced** | Score 11.15 | Dynamic INT8 + Structured 65% |
+| **Success Rate** | 100% (102/102) | All combinations worked |
+| **Pareto Optimal** | 3 solutions | Automatically identified |
+
+> 💡 **All visualizations auto-generated** by running:
+> ```
+> python examples/real_world/02_optimize_yolov8.py
+> ```
+
 
 ---
 
