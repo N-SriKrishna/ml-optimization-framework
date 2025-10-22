@@ -1,0 +1,38 @@
+# Example configuration for optimization framework
+
+model:
+  path: "models/yolov8.onnx"
+  type: "detection"
+
+hardware:
+  device_name: "Snapdragon 680"
+  cpu_cores: 8
+  cpu_frequency_ghz: 2.4
+  ram_total_gb: 4.0
+  ram_available_gb: 2.5
+  has_gpu: false
+  has_npu: false
+  storage_available_gb: 1.0
+  thermal_class: "moderate"
+  power_budget: "mobile"
+
+performance:
+  max_latency_ms: 300
+  max_model_size_mb: 20
+  min_accuracy: 0.90
+  max_accuracy_drop: 0.05
+
+optimization:
+  goal: "balanced"  # speed, size, accuracy, balanced
+  techniques:
+    - quantization
+    - pruning
+  priority: "high"
+  num_variants: 3
+
+output:
+  directory: "./outputs"
+  formats:
+    - onnx
+    - tflite
+  generate_report: true
