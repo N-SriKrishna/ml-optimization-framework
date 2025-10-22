@@ -18,7 +18,7 @@ A comprehensive, ONNX-centric framework for optimizing deep learning models with
 ## 📊 Quick Example
 
 Optimize YOLOv8 in under 10 seconds:
-
+'''
 from src.converters.onnx_converter import convert_to_onnx
 from src.analyzers.onnx_analyzer import ONNXAnalyzer
 from src.solvers.constraint_solver import ConstraintSolver, OptimizationConstraints
@@ -34,53 +34,56 @@ Optimize
 constraints = OptimizationConstraints(optimization_goal='balanced')
 solver = ConstraintSolver(constraints)
 strategy = solver.solve(analysis)
-
+'''
 **Result**: 3.67× compression, 2.18× speedup, with full Pareto analysis!
 
 ## 🚀 Installation
 
 Clone repository
+'''
 git clone https://github.com/N-SriKrishna/ml-optimization-framework.git
 cd ml-optimization-framework
-
+'''
 Create virtual environment
+'''
 python -m venv venv
 source venv/bin/activate # On Windows: venv\Scripts\activate
-
+'''
 Install dependencies
+'''
 pip install -r requirements.txt
-
+'''
 
 ## 📦 Dependencies
-
+'''
 pip install onnx onnxruntime onnx-simplifier
 pip install torch torchvision tensorflow tf2onnx
 pip install numpy pandas matplotlib seaborn plotly
 pip install pyyaml tqdm colorama tabulate pytest
-
+'''
 
 ## 🎓 Usage
 
 ### **1. Simple Quantization**
-
+'''
 from src.optimizers.quantizer import quantize_dynamic_int8
 
 quantize_dynamic_int8('model.onnx', 'model_int8.onnx')
-
+'''
 Result: 4× smaller, 2× faster
 
 
 ### **2. Pruning**
-
+'''
 from src.optimizers.pruner import prune_magnitude_global
 
 prune_magnitude_global('model.onnx', 'model_pruned.onnx', sparsity=0.5)
-
+'''
 Result: 50% parameters removed
 
 
 ### **3. Complete Optimization Pipeline**
-
+'''
 from src.solvers.variant_generator import VariantGenerator
 
 generator = VariantGenerator(output_dir='outputs')
@@ -89,26 +92,27 @@ model_path='model.onnx',
 strategy=strategy,
 num_variants=5
 )
-
+'''
 Result: 5 optimized models with different trade-offs
 
 
 ### **4. Pareto Analysis**
-
+'''
 from src.evaluators.pareto_analyzer import ParetoAnalyzer
 
 analyzer = ParetoAnalyzer(objectives=['accuracy', 'latency', 'size'])
 analysis = analyzer.analyze(variants)
-
+'''
 Result: Pareto-optimal models identified
 
 
 ## 📈 Real-World Example: YOLOv8
 
 Download and optimize YOLOv8
+'''
 python examples/real_world/01_download_yolov8.py
 python examples/real_world/02_optimize_yolov8.py
-
+'''
 
 **Results:**
 - Original: 12.26 MB
@@ -121,16 +125,18 @@ See `examples/real_world/` for complete code.
 ## 🧪 Testing
 
 Run all tests
+'''
 PYTHONPATH=. pytest tests/ -v
-
+'''
 Run specific test
+'''
 PYTHONPATH=. pytest tests/test_quantization.py -v
-
+'''
 
 **Test Coverage**: 14/14 tests passing ✅
 
 ## 📁 Project Structure
-
+'''
 ml-optimization-framework/
 ├── src/
 │ ├── converters/ # Format conversion (PyTorch, TF → ONNX)
@@ -146,7 +152,7 @@ ml-optimization-framework/
 ├── configs/ # Configuration templates
 ├── requirements.txt # Dependencies
 └── README.md # This file
-
+'''
 
 ## 🎯 Supported Models
 
@@ -194,7 +200,7 @@ ml-optimization-framework/
 
 ### **1. Constraint-Based Optimization**
 Define your deployment constraints, and the framework automatically finds the best optimization strategy:
-
+'''
 constraints = OptimizationConstraints(
 hardware=HardwareConstraints(device_name="Snapdragon 680"),
 performance=PerformanceConstraints(
@@ -203,16 +209,17 @@ max_model_size_mb=20,
 min_accuracy=0.90
 )
 )
-
+'''
 
 ### **2. Multi-Objective Pareto Analysis**
 Identify optimal trade-offs between accuracy, latency, and model size:
-
+'''
 pareto_analyzer = ParetoAnalyzer(
 objectives=['accuracy', 'latency', 'size'],
 minimize=['latency', 'size'],
 maximize=['accuracy']
 )
+'''
 
 
 ### **3. Rich Visualizations**
