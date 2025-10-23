@@ -188,54 +188,79 @@ class ONNXConverter:
 
 
     def _export_dynamic_onnx(
-            self,
-            model: torch.nn.Module,
-            dummy_input: torch.Tensor,
-            output_path: Path,
-            input_names: List[str],
-            output_names: List[str],
-            opset_version: int,
-            verbose: bool = False,
-        ) -> None:
-            """Export PyTorch model to ONNX with real symbolic dynamic shapes using torch.onnx.dynamo_export."""
+        self,
+        model: torch.nn.Module,
+        dummy_input: torch.Tensor,
+        output_path: Path,
+        input_names: List[str],
+        output_names: List[str],
+        opset_version: int,
+        verbose: bool = False,
+    ) -> None:
+        """Export PyTorch model to ONNX with real symbolic dynamic shapes using torch.onnx.dynamo_export."""
+        
+        from onnx import save as onnx_save
+
+        # Try modern dynamo exporter (PyTorch 2.4+), else fallback to torch.onnx.export
+        try:
+            from torch.onnx import dynamo_export
+            HAS_DYNAMO_EXPORT = True
+        except Exception:
+            HAS_DYNAMO_EXPORT = False
+
+        if HAS_DYNAMO_EXPORT:
+            logger.info("Using torch.onnx.dynamo_export for dynamic ONNX export")
             
-            from onnx import save as onnx_save
-
-                # Try modern dynamo exporter (PyTorch 2.4+), else fallback to torch.onnx.export
             try:
-                    from torch.onnx import dynamo_export
-                    HAS_DYNAMO_EXPORT = True
-            except Exception:
-                    HAS_DYNAMO_EXPORT = False
-
-
-            if HAS_DYNAMO_EXPORT:
-                    logger.info("Using torch.onnx.dynamo_export for dynamic ONNX export")
-                    dynamic_shapes = [{0: "batch"}]
-                    onnx_model = dynamo_export(
-                        model,
-                        dummy_input,
-                        dynamic_shapes=dynamic_shapes,
-                        export_options=torch.onnx.ExportOptions(
-                            opset_version=opset_version,
-                            dynamic_shapes=True,
-                        ),
-                    )
-                    onnx_save(onnx_model.model_proto, str(output_path))
-            else:
-                    logger.warning("torch.onnx.dynamo_export not found — falling back to torch.onnx.export")
-                    torch.onnx.export(
-                        model,
-                        dummy_input,
-                        str(output_path),
-                        export_params=True,
+                # Try with opset_version in ExportOptions (older API)
+                dynamic_shapes = [{0: "batch"}]
+                onnx_model = dynamo_export(
+                    model,
+                    dummy_input,
+                    dynamic_shapes=dynamic_shapes,
+                    export_options=torch.onnx.ExportOptions(
                         opset_version=opset_version,
-                        do_constant_folding=True,
-                        input_names=input_names,
-                        output_names=output_names,
-                        dynamic_axes={input_names[0]: {0: "batch_size"}, output_names[0]: {0: "batch_size"}},
-                        verbose=verbose,
+                        dynamic_shapes=True,
+                    ),
+                )
+                onnx_save(onnx_model.model_proto, str(output_path))
+                
+            except TypeError as e:
+                # Fallback: ExportOptions doesn't accept opset_version (newer API)
+                logger.info("Using newer ExportOptions API without opset_version parameter")
+                dynamic_shapes = [{0: "batch"}]
+                onnx_model = dynamo_export(
+                    model,
+                    dummy_input,
+                    dynamic_shapes=dynamic_shapes,
+                    export_options=torch.onnx.ExportOptions(
+                        dynamic_shapes=True,
+                    ),
+                )
+                onnx_save(onnx_model.model_proto, str(output_path))
+                
+                # Set opset version after export if needed
+                import onnx
+                loaded_model = onnx.load(str(output_path))
+                if loaded_model.opset_import[0].version != opset_version:
+                    logger.warning(
+                        f"Model exported with opset {loaded_model.opset_import[0].version}, "
+                        f"requested {opset_version}"
                     )
+        else:
+            logger.warning("torch.onnx.dynamo_export not found — falling back to torch.onnx.export")
+            torch.onnx.export(
+                model,
+                dummy_input,
+                str(output_path),
+                export_params=True,
+                opset_version=opset_version,
+                do_constant_folding=True,
+                input_names=input_names,
+                output_names=output_names,
+                dynamic_axes={input_names[0]: {0: "batch_size"}, output_names[0]: {0: "batch_size"}},
+                verbose=verbose,
+            )
 
 
 
