@@ -127,9 +127,18 @@ class ONNXQuantizer:
         
         original_size = get_model_size_mb(model_path)
         logger.info(f"Original model size: {original_size:.2f} MB")
+
+        # Get output node names to exclude from quantization
+        try:
+            model = onnx.load(str(model_path))
+            nodes_to_exclude = [output.name for output in model.graph.output]
+            logger.info(f"Excluding output nodes from quantization: {nodes_to_exclude}")
+        except Exception as e:
+             logger.warning(f"Could not parse ONNX to find output nodes: {e}. Proceeding without exclusion.")
+             nodes_to_exclude = []
         
         if self.config.quantization_type == 'dynamic':
-            self._quantize_dynamic(model_path, output_path)
+            self._quantize_dynamic(model_path, output_path, nodes_to_exclude)
         
         elif self.config.quantization_type == 'static':
             if calibration_data_generator is None or input_name is None:
@@ -142,7 +151,8 @@ class ONNXQuantizer:
                 output_path,
                 calibration_data_generator,
                 input_name,
-                num_calibration_samples
+                num_calibration_samples,
+                nodes_to_exclude
             )
         
         elif self.config.quantization_type == 'qat':
@@ -156,7 +166,8 @@ class ONNXQuantizer:
                 output_path,
                 calibration_data_generator,
                 input_name,
-                num_calibration_samples
+                num_calibration_samples,
+                nodes_to_exclude
             )
         
         else:
@@ -173,14 +184,15 @@ class ONNXQuantizer:
         
         return output_path
     
-    def _quantize_dynamic(self, model_path: Path, output_path: Path):
+    def _quantize_dynamic(self, model_path: Path, output_path: Path, nodes_to_exclude: List[str]):
         """Apply dynamic quantization"""
         logger.info("Applying dynamic quantization (per-token activation quantization)...")
         
         quantize_dynamic(
             model_input=str(model_path),
             model_output=str(output_path),
-            weight_type=self.config.weight_type
+            weight_type=self.config.weight_type,
+            nodes_to_exclude=nodes_to_exclude
         )
         
         logger.info("✓ Dynamic quantization applied")
@@ -191,7 +203,8 @@ class ONNXQuantizer:
         output_path: Path,
         calibration_data_generator: Callable,
         input_name: str,
-        num_samples: int
+        num_samples: int,
+        nodes_to_exclude: List[str]
     ):
         """Apply static quantization with calibration"""
         logger.info("Applying static quantization (PTQ with calibration)...")
@@ -214,7 +227,8 @@ class ONNXQuantizer:
             per_channel=self.config.per_channel,
             reduce_range=self.config.reduce_range,
             activation_type=self.config.activation_type,
-            weight_type=self.config.weight_type
+            weight_type=self.config.weight_type,
+            
         )
         
         logger.info("✓ Static quantization applied")
