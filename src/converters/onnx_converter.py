@@ -24,7 +24,7 @@ class ONNXConverter:
     Convert models from various formats to ONNX
     """
     
-    def __init__(self, simplify: bool = True, opset_version: int = 14):
+    def __init__(self, simplify: bool = True, opset_version: int = 18):
         """
         Initialize ONNX converter
         
