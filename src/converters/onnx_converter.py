@@ -383,7 +383,7 @@ class ONNXConverter:
             
             # Check if tflite2onnx is available
             try:
-                import tflite2onnx
+                import tflite2onnx # type: ignore
             except ImportError:
                 raise ImportError(
                     "tflite2onnx is required for TFLite conversion. "
