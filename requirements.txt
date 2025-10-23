@@ -115,7 +115,7 @@ onnxruntime==1.23.1
 onnxruntime-gpu==1.23.0
 onnxscript==0.5.4
 onnxslim==0.1.71
-opencv-python==4.6.0.66
+opencv-python==4.5.5.62
 openvino==2025.3.0
 openvino-telemetry==2025.2.0
 opt-einsum==3.3.0
