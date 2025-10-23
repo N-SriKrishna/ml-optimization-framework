@@ -24,12 +24,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # Install conflicting packages WITHOUT dependency checking
+        # Install packages with conflicting dependencies WITHOUT checking
         pip install --no-deps tf2onnx==1.16.1
         pip install --no-deps paddleseg==2.8.0
         # Install everything else from requirements.txt
         pip install -r requirements.txt
-        # Ensure pytest tools are installed
+        # Ensure test tools are available
         pip install pytest pytest-cov
     
     - name: Run tests
