@@ -24,7 +24,7 @@ from src.evaluators.pareto_analyzer import ParetoAnalyzer
 from src.converters.smart_deployment_exporter import SmartDeploymentExporter
 
 
-class TestCompleteModel(nn.Module):
+class CompleteModel(nn.Module):
     """Test model for complete framework testing"""
     def __init__(self):
         super().__init__()
@@ -58,7 +58,7 @@ def test_01_model_conversion(test_workspace):
     print("="*80)
     
     # Create PyTorch model
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
@@ -67,8 +67,10 @@ def test_01_model_conversion(test_workspace):
     result = convert_to_onnx(
         pt_path,
         onnx_path,
-        input_shape=(1, 3, 224, 224)
+        input_shape=(1,3,224,224),
+        dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
     )
+    
     
     assert result.exists()
     assert result.stat().st_size > 0
@@ -82,12 +84,17 @@ def test_02_model_analysis(test_workspace):
     print("="*80)
     
     # Create and convert model
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+        pt_path,
+        onnx_path,
+        input_shape=(1,3,224,224),
+        dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+    )
     
     # Analyze
     analyzer = ONNXAnalyzer(onnx_path)
@@ -109,12 +116,17 @@ def test_03_quantization(test_workspace):
     print("="*80)
     
     # Setup
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     # Quantize
     config = QuantizationConfig(quantization_type='dynamic')
@@ -141,12 +153,17 @@ def test_04_pruning(test_workspace):
     print("="*80)
     
     # Setup
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     # Prune
     config = PruningConfig(pruning_type='magnitude', sparsity=0.5)
@@ -172,12 +189,17 @@ def test_05_constraint_solver(test_workspace):
     print("="*80)
     
     # Setup
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     # Analyze
     analyzer = ONNXAnalyzer(onnx_path)
@@ -223,12 +245,17 @@ def test_06_combination_exploration(test_workspace):
     print("="*80)
     
     # Setup
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     # Explore combinations (limit to 10 for speed)
     explorer = CombinationExplorer(test_workspace / 'combinations')
@@ -254,12 +281,17 @@ def test_07_pareto_analysis(test_workspace):
     print("="*80)
     
     # Setup
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     # Generate variants
     explorer = CombinationExplorer(test_workspace / 'variants')
@@ -318,12 +350,17 @@ def test_08_smart_deployment(test_workspace):
     print("="*80)
     
     # Setup
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     # Test deployment recommendations
     hardware = HardwareConstraints(
@@ -357,14 +394,19 @@ def test_09_end_to_end_pipeline(test_workspace):
     print("="*80)
     
     # 1. Create model
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     print("  1. Model created ✓")
     
     # 2. Convert
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     print("  2. Converted to ONNX ✓")
     
     # 3. Analyze
@@ -416,12 +458,17 @@ def test_10_error_handling(test_workspace):
         print(f"  ✓ Handled invalid path: {type(e).__name__}")
     
     # Combination explorer should handle failures
-    model = TestCompleteModel()
+    model = CompleteModel()
     pt_path = test_workspace / 'model.pt'
     torch.save(model, pt_path)
     
     onnx_path = test_workspace / 'model.onnx'
-    convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+    convert_to_onnx(
+    pt_path,
+    onnx_path,
+    input_shape=(1,3,224,224),
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
+)
     
     explorer = CombinationExplorer(test_workspace / 'robust_test')
     results = explorer.explore_all_combinations(onnx_path, max_combinations=5)

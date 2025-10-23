@@ -74,7 +74,16 @@ def test_static_quantization():
         torch.save(model, pt_path)
         
         onnx_path = tmpdir / 'model.onnx'
-        convert_to_onnx(pt_path, onnx_path, input_shape=(1, 3, 224, 224))
+        convert_to_onnx(
+            pt_path,
+            onnx_path,
+            input_shape=(1, 3, 224, 224),
+            dynamic_axes={
+                "input": {0: "batch_size"},
+                "output": {0: "batch_size"}
+            }
+        )
+
         
         # Create calibration data generator
         def calibration_data_generator():

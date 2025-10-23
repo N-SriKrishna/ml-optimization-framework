@@ -66,3 +66,4 @@ htmlcov/
 # Allow documentation images (proof of concept)
 !docs/images/*.png
 !docs/benchmarks/*.md
+local_requirements.txt
