@@ -139,7 +139,7 @@ polars-runtime-32==1.34.0
 prettytable==3.16.0
 prompt_toolkit==3.0.52
 propcache==0.4.1
-protobuf==5.29.5
+protobuf>=3.20.3,<5.0
 psutil==7.1.1
 ptyprocess==0.7.0
 pure_eval==0.2.3
