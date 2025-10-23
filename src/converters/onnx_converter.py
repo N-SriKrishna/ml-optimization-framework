@@ -113,73 +113,132 @@ class ONNXConverter:
         return output_path
     
     def _pytorch_to_onnx(
-        self,
-        model_path: Path,
-        output_path: Path,
-        input_shape: Optional[Tuple[int, ...]] = None,
-        input_names: Optional[List[str]] = None,
-        output_names: Optional[List[str]] = None,
-        dynamic_axes: Optional[Dict[str, Dict[int, str]]] = None,
-        **kwargs
-    ):
-        """Convert PyTorch model to ONNX"""
-        try:
-            logger.info("Loading PyTorch model...")
-            device = torch.device('cpu')
+            self,
+            model_path: Path,
+            output_path: Path,
+            input_shape: Optional[Tuple[int, ...]] = None,
+            input_names: Optional[List[str]] = None,
+            output_names: Optional[List[str]] = None,
+            dynamic_axes: Optional[Dict[str, Dict[int, str]]] = None,
+            **kwargs
+        ):
+            """Convert PyTorch model to ONNX"""
+            try:
+                logger.info("Loading PyTorch model...")
+                device = torch.device('cpu')
+                
+                checkpoint = torch.load(model_path, map_location=device, weights_only=False)
+                model = self._extract_pytorch_model(checkpoint)
+                model.eval()
+                
+                if input_shape is None:
+                    input_shape = self._infer_pytorch_input_shape(model, kwargs)
+                    logger.warning(f"No input shape provided, using inferred: {input_shape}")
+                
+                dummy_input = torch.randn(*input_shape, device=device)
+                
+                if input_names is None:
+                    input_names = ['input']
+                if output_names is None:
+                    output_names = ['output']
+                
+                if dynamic_axes is None:
+                    dynamic_axes = {
+                        input_names[0]: {0: 'batch_size'},
+                        output_names[0]: {0: 'batch_size'}
+                    }
+                
+                logger.info(f"Exporting with input shape: {input_shape}")
+                logger.info(f"Input names: {input_names}")
+                logger.info(f"Output names: {output_names}")
+                
+                try:
+                    if dynamic_axes is not None:
+                        # Use new dynamo exporter for proper symbolic batch dimension
+                        self._export_dynamic_onnx(
+                            model,
+                            dummy_input,
+                            output_path,
+                            input_names,
+                            output_names,
+                            self.opset_version,
+                            verbose=False,
+                        )
+                    else:
+                        torch.onnx.export(
+                            model,
+                            dummy_input,
+                            str(output_path),
+                            export_params=True,
+                            opset_version=self.opset_version,
+                            do_constant_folding=True,
+                            input_names=input_names,
+                            output_names=output_names,
+                            dynamic_axes=None,
+                            verbose=False,
+                        )
+
+                    logger.info("✓ PyTorch to ONNX conversion successful")
+                except Exception as e:
+                    logger.error(f"Failed during ONNX export: {e}")
+                    raise
+            except Exception as e:
+                logger.error(f"Error in _pytorch_to_onnx: {e}")
+                raise
+
+
+    def _export_dynamic_onnx(
+            self,
+            model: torch.nn.Module,
+            dummy_input: torch.Tensor,
+            output_path: Path,
+            input_names: List[str],
+            output_names: List[str],
+            opset_version: int,
+            verbose: bool = False,
+        ) -> None:
+            """Export PyTorch model to ONNX with real symbolic dynamic shapes using torch.onnx.dynamo_export."""
             
-            # Load checkpoint
-            checkpoint = torch.load(model_path, map_location=device, weights_only=False)
-            
-            # Extract model from checkpoint
-            model = self._extract_pytorch_model(checkpoint)
-            model.eval()
-            
-            # Determine input shape
-            if input_shape is None:
-                input_shape = self._infer_pytorch_input_shape(model, kwargs)
-                logger.warning(f"No input shape provided, using inferred: {input_shape}")
-            
-            # Create dummy input
-            dummy_input = torch.randn(*input_shape, device=device)
-            
-            # Set default names
-            if input_names is None:
-                input_names = ['input']
-            if output_names is None:
-                output_names = ['output']
-            
-            # Set dynamic axes if not provided
-            if dynamic_axes is None:
-                dynamic_axes = {
-                    input_names[0]: {0: 'batch_size'},
-                    output_names[0]: {0: 'batch_size'}
-                }
-            
-            logger.info(f"Exporting with input shape: {input_shape}")
-            logger.info(f"Input names: {input_names}")
-            logger.info(f"Output names: {output_names}")
-            
-            # Export to ONNX
-            torch.onnx.export(
-                model,
-                dummy_input,
-                str(output_path),
-                export_params=True,
-                opset_version=self.opset_version,
-                do_constant_folding=True,
-                input_names=input_names,
-                output_names=output_names,
-                dynamic_axes=dynamic_axes,
-                verbose=False
-            )
-            
-            logger.info("✓ PyTorch to ONNX conversion successful")
-            
-        except Exception as e:
-            logger.error(f"Failed to convert PyTorch model: {e}")
-            logger.error("Make sure the model is a complete torch.nn.Module, not just state_dict")
-            raise
-    
+            from onnx import save as onnx_save
+
+                # Try modern dynamo exporter (PyTorch 2.4+), else fallback to torch.onnx.export
+            try:
+                    from torch.onnx import dynamo_export
+                    HAS_DYNAMO_EXPORT = True
+            except Exception:
+                    HAS_DYNAMO_EXPORT = False
+
+
+            if HAS_DYNAMO_EXPORT:
+                    logger.info("Using torch.onnx.dynamo_export for dynamic ONNX export")
+                    dynamic_shapes = [{0: "batch"}]
+                    onnx_model = dynamo_export(
+                        model,
+                        dummy_input,
+                        dynamic_shapes=dynamic_shapes,
+                        export_options=torch.onnx.ExportOptions(
+                            opset_version=opset_version,
+                            dynamic_shapes=True,
+                        ),
+                    )
+                    onnx_save(onnx_model.model_proto, str(output_path))
+            else:
+                    logger.warning("torch.onnx.dynamo_export not found — falling back to torch.onnx.export")
+                    torch.onnx.export(
+                        model,
+                        dummy_input,
+                        str(output_path),
+                        export_params=True,
+                        opset_version=opset_version,
+                        do_constant_folding=True,
+                        input_names=input_names,
+                        output_names=output_names,
+                        dynamic_axes={input_names[0]: {0: "batch_size"}, output_names[0]: {0: "batch_size"}},
+                        verbose=verbose,
+                    )
+
+
+
     def _extract_pytorch_model(self, checkpoint: Any) -> torch.nn.Module:
         """Extract PyTorch model from various checkpoint formats"""
         
