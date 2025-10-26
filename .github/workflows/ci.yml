@@ -36,22 +36,28 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
     
-    - name: Install other dependencies
+    - name: Install ONNX and dependencies
       run: |
-        pip install protobuf
-        pip install --no-deps -r requirements.txt
+        pip install protobuf ml_dtypes
+        pip install onnx==1.19.1 onnxmltools>=1.11.2 onnxruntime==1.23.1 onnxscript==0.5.4
+    
+    - name: Install remaining dependencies
+      run: |
+        pip install colorama>=0.4.6 matplotlib>=3.7.1 pandas>=2.0.2 pyyaml>=6.0 seaborn>=0.12.0 tqdm>=4.65.0 ultralytics>=8.0.120
         pip install pytest pytest-cov
     
-    - name: Verify PyTorch installation
+    - name: Verify installations
       run: |
-        python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA available: {torch.cuda.is_available()}')"
+        python -c "import torch; print(f'PyTorch: {torch.__version__}')"
+        python -c "import onnx; print(f'ONNX: {onnx.__version__}')"
+        python -c "import ml_dtypes; print(f'ml_dtypes installed')"
     
     - name: Run tests with coverage
       env:
         PYTHONPATH: ${{ github.workspace }}
         CUDA_VISIBLE_DEVICES: ""
       run: |
-        pytest tests/ -v --cov=src --cov-report=xml --cov-report=term -k "not cuda and not gpu"
+        pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
